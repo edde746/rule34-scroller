@@ -1,3 +1,11 @@
+<svelte:head>
+  <title>Guide - hntai.lol</title>
+  <meta
+    name="description"
+    content="Learn how to best search hntai.lol for the content you want to see the most"
+  />
+</svelte:head>
+
 <div class="prose prose-invert">
   <h2 id="searching">Searching</h2>
   <h3 id="tags">Tags</h3>

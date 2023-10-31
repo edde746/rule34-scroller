@@ -11,6 +11,23 @@
   $: currentPage = Number($page.params.page || 1);
 </script>
 
+<svelte:head>
+  {#if currentPage == 1}
+    <title>Tag Directory - hntai.lol</title>
+  {:else}
+    <title>Page {currentPage} - Tag Directory - hntai.lol</title>
+  {/if}
+  <meta
+    name="description"
+    content="Discover tags like {data.tags
+      .sort((a, b) => Math.random() - 0.5)
+      .slice(0, 3)
+      .map((t) => t.name)
+      .join(', ')
+      .replace(/_/g, ' ')} and more on hntai.lol"
+  />
+</svelte:head>
+
 <div class="flex gap-2 items-center justify-between mb-3">
   <a href="/tags/{Math.max(1, currentPage - 1)}">
     <Icon src={ChevronLeft} class="w-5 h-5" />

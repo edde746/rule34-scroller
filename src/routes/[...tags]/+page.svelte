@@ -116,12 +116,22 @@
 />
 
 <svelte:head>
-  <title>r34-scroller</title>
-  <meta
-    name="description"
-    content="Discover the latest memes, pictures, videos, and more from r/{$page
-      .params.subreddit} with rscroll.app, an infinite Reddit scroll viewer."
-  />
+  {#if $tags.filter((t) => !t.value.startsWith("sort:")).length}
+    <title>{$page.params.tags} - hntai.lol</title>
+    <meta
+      name="description"
+      content="Discover thousands of high quality {$tags
+        .filter((t) => !t.value.startsWith('sort:'))
+        .join(', ')
+        .replace(/_/g, ' ')} and more images and videos on hntai.lol"
+    />
+  {:else}
+    <title>Welcome to hntai.lol</title>
+    <meta
+      name="description"
+      content="Discover thousands of high quality hentai porn images and videos on hntai.lol"
+    />
+  {/if}
 </svelte:head>
 
 <div class="py-4 solid-bg sticky top-0 z-50">

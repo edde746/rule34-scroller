@@ -9,6 +9,19 @@
   $: sourceDomain = data.source ? new URL(data.source).hostname : undefined;
 </script>
 
+<svelte:head>
+  <title>Post #{data.id} - hntai.lol</title>
+  <meta
+    name="description"
+    content="View post #{data.id} with tags like {data.tags
+      .split(' ')
+      .sort((a, b) => Math.random() - 0.5)
+      .slice(0, 5)
+      .join(', ')
+      .replace(/_/g, ' ')} and more hentai images and videos on hntai.lol"
+  />
+</svelte:head>
+
 <div
   class="media bg-neutral-900 absolute left-0"
   bind:clientHeight={imageHeight}
