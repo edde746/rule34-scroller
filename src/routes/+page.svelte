@@ -7,27 +7,25 @@
   import Masonry from "$lib/Masonry.svelte";
   import { onMount } from "svelte";
   import { createTagsInput, melt } from "@melt-ui/svelte";
+  import { goto } from "$app/navigation";
+  import { browser } from "$app/environment";
 
   const {
     elements: { root, input, tag, deleteTrigger, edit },
     states: { tags },
   } = createTagsInput({
     unique: true,
+    defaultTags: $page.url.searchParams.get("tags")?.split(" ") ?? [],
   });
 
   let posts: Post[] = [];
   let postsInView: string[] = [];
   let errored: number[] = [];
 
-  let pageIndex = 1;
+  let pageIndex = parseInt($page.url.searchParams.get("page") || "1");
 
   let loading = false,
     outOfPosts = false;
-
-  const inviewOptions = {
-    rootMargin: "150% 0px",
-    threshold: 0,
-  };
 
   $: postCount = posts.reduce((count, post) => {
     return errored.includes(post.id) ? count : count + 1;
@@ -45,27 +43,33 @@
     fetch(`/posts?${new URLSearchParams(params)}`)
       .then((res) => res.json())
       .then((res) => {
-        posts = [...posts, ...res];
         loading = false;
         if (res.length == 0) outOfPosts = true;
+        else posts = [...posts, ...res];
       });
   };
 
-  onMount(fetchNextPage);
-
-  $: $tags.length &&
-    (() => {
+  onMount(() => {
+    fetchNextPage();
+    tags.subscribe(() => {
       postsInView = [];
       posts = [];
       pageIndex = 1;
       outOfPosts = false;
       fetchNextPage();
-    })();
+    });
+  });
+
+  // $: browser &&
+  //   goto(`?tags=${$tags.map((t) => t.value).join(" ")}&page=${pageIndex - 1}`, {
+  //     replaceState: true,
+  //     noScroll: true,
+  //     invalidateAll: false,
+  //   });
 </script>
 
 <svelte:window
   on:scroll={() => {
-    // maybe not nessesary anymore
     if (window.innerHeight * 1.6 + window.scrollY >= document.body.offsetHeight)
       fetchNextPage();
   }}
@@ -116,47 +120,37 @@
   </div>
   <Masonry items={posts} let:item={post} let:index={i}>
     {#if post}
-      {@const isPostInView = postsInView.includes(post.id)}
       <a
-        use:inview={inviewOptions}
-        on:inview_change={(event) => {
-          if (event.detail.inView) {
-            postsInView = [...postsInView, post.id];
-            if (i > postCount - 5) fetchNextPage();
-          } else {
-            postsInView = postsInView.filter((p) => p !== post.id);
-          }
-        }}
         style="aspect-ratio: {post.width}/{post.height}"
         href={post.file_url}
         target="_blank"
         rel="noopener noreferrer"
       >
         <div class="absolute inset-0 bg-neutral-200 dark:bg-neutral-800" />
-        {#if isPostInView}
-          {#if post.file_url.endsWith(".mp4")}
-            <div
-              class="inset-0 absolute backdrop-blur-[2px] flex items-center justify-center z-30"
-            >
-              <Icon
-                src={Play}
-                class="w-16 h-16 text-neutral-100 drop-shadow-md"
-              />
-            </div>
-            <img
-              src={post.sample_url}
-              alt={post.tags.join(", ")}
-              class="media"
-              on:error={() => (errored = [...errored, post.id])}
+        {#if post.file_url.endsWith(".mp4")}
+          <div
+            class="inset-0 absolute backdrop-blur-[2px] flex items-center justify-center z-30"
+          >
+            <Icon
+              src={Play}
+              class="w-16 h-16 text-neutral-100 drop-shadow-md"
             />
-          {:else}
-            <img
-              src={post.sample_url}
-              alt={post.tags.join(", ")}
-              class="media"
-              on:error={() => (errored = [...errored, post.id])}
-            />
-          {/if}
+          </div>
+          <img
+            src={post.sample_url}
+            alt={post.tags.join(", ")}
+            class="media"
+            loading="lazy"
+            on:error={() => (errored = [...errored, post.id])}
+          />
+        {:else}
+          <img
+            src={post.sample_url}
+            alt={post.tags.join(", ")}
+            class="media"
+            loading="lazy"
+            on:error={() => (errored = [...errored, post.id])}
+          />
         {/if}
       </a>
     {/if}
@@ -165,7 +159,7 @@
 
 {#if loading}
   <div class="flex w-full justify-center my-5">
-    <Spinner />
+    <Spinner fill="white" />
   </div>
 {:else if outOfPosts || postCount == 0}
   <div class="flex w-full justify-center my-5 text-lg">No more posts</div>

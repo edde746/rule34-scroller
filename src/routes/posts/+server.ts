@@ -1,17 +1,17 @@
-import { RequestHandler, json } from "@sveltejs/kit";
+import { type RequestHandler, json, error } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url }) => {
   const page = Number(url.searchParams.get("page")) || 0;
   const query = url.searchParams.get("query") || "";
 
   const posts = await fetch(
-    `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=50&pid=${page}&tags=${query}`
-  )
-    .then((res) => res.json())
-    .catch(() => []);
+    `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=100&pid=${page}&tags=${query}`
+  );
+
+  if (!posts.ok) throw error(posts.status, await posts.text());
 
   return json(
-    posts.map((post) => ({
+    (await posts.json()).map((post: any) => ({
       id: post.id,
       sample_url: post.sample_url,
       file_url: post.file_url,
