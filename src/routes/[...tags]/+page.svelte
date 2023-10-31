@@ -65,7 +65,7 @@
     };
 
     fetch(
-      `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=100&pid=${params.page}&tags=${params.query}`
+      `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=50&pid=${params.page}&tags=${params.query}`
     )
       .then((res) => res.json())
       .then((res) => {

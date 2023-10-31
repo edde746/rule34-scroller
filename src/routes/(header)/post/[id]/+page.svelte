@@ -68,8 +68,4 @@
     @apply w-screen object-contain object-center;
     max-height: 80vh;
   }
-
-  .pill {
-    @apply rounded-full px-3 py-1 flex transition bg-neutral-900 hover:bg-neutral-800;
-  }
 </style>

@@ -4,7 +4,7 @@
 </script>
 
 <div class="flex justify-between items-center mb-2">
-  <h1 class="font-semibold">hentai.app</h1>
+  <h1 class="font-semibold">hntai.lol</h1>
   <nav>
     <a href="/">
       <Icon src={Home} class="w-4 h-4" />
