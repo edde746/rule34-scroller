@@ -9,15 +9,14 @@
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
+  import Header from "$lib/Header.svelte";
 
   const {
     elements: { root, input, tag, deleteTrigger, edit },
     states: { tags },
   } = createTagsInput({
     unique: true,
-    defaultTags: $page.url.searchParams.get("tags")?.length
-      ? $page.url.searchParams.get("tags")!.split(" ")
-      : [],
+    defaultTags: $page.params.tags?.length ? $page.params.tags!.split(" ") : [],
     onTagsChange: ({ curr, next }) => {
       postsInView = [];
       posts = [];
@@ -87,8 +86,9 @@
 
   $: browser &&
     goto(
-      `?${new URLSearchParams({
-        tags: $tags.length ? $tags.map((t) => t.value).join(" ") : "",
+      `/${
+        $tags.length ? $tags.map((t) => t.value).join(" ") : ""
+      }?${new URLSearchParams({
         page: (pageIndex - 1).toString(),
       })}`,
       {
@@ -116,6 +116,7 @@
 </svelte:head>
 
 <div class="py-4 solid-bg sticky top-0 z-50">
+  <Header />
   <div
     use:melt={$root}
     class="w-full z-50 focus:outline-none dark:bg-neutral-900 bg-neutral-200 px-4 py-2 rounded-lg flex gap-2 overflow-x-auto"
@@ -150,6 +151,7 @@
     />
   </div>
 </div>
+
 <Masonry items={posts} let:item={post} let:index={i}>
   {#if post}
     <Post on:error={() => (errored = [...errored, post.id])} {post} />
