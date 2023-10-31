@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { navigating, page } from "$app/stores";
-  import { inview } from "svelte-inview";
   import { Icon } from "@steeze-ui/svelte-icon";
-  import { Play, X } from "@steeze-ui/lucide-icons";
+  import { X } from "@steeze-ui/lucide-icons";
   import Spinner from "$lib/Spinner.svelte";
   import Masonry from "$lib/Masonry.svelte";
   import { onMount } from "svelte";
   import { createTagsInput, melt } from "@melt-ui/svelte";
+  import Post from "./Post.svelte";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
+  import { page } from "$app/stores";
 
   const {
     elements: { root, input, tag, deleteTrigger, edit },
@@ -60,12 +60,12 @@
     });
   });
 
-  // $: browser &&
-  //   goto(`?tags=${$tags.map((t) => t.value).join(" ")}&page=${pageIndex - 1}`, {
-  //     replaceState: true,
-  //     noScroll: true,
-  //     invalidateAll: false,
-  //   });
+  $: browser &&
+    goto(`?tags=${$tags.map((t) => t.value).join(" ")}&page=${pageIndex - 1}`, {
+      replaceState: true,
+      noScroll: true,
+      invalidateAll: false,
+    });
 </script>
 
 <svelte:window
@@ -120,39 +120,7 @@
   </div>
   <Masonry items={posts} let:item={post} let:index={i}>
     {#if post}
-      <a
-        style="aspect-ratio: {post.width}/{post.height}"
-        href={post.file_url}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <div class="absolute inset-0 bg-neutral-200 dark:bg-neutral-800" />
-        {#if post.file_url.endsWith(".mp4")}
-          <div
-            class="inset-0 absolute backdrop-blur-[2px] flex items-center justify-center z-30"
-          >
-            <Icon
-              src={Play}
-              class="w-16 h-16 text-neutral-100 drop-shadow-md"
-            />
-          </div>
-          <img
-            src={post.sample_url}
-            alt={post.tags.join(", ")}
-            class="media"
-            loading="lazy"
-            on:error={() => (errored = [...errored, post.id])}
-          />
-        {:else}
-          <img
-            src={post.sample_url}
-            alt={post.tags.join(", ")}
-            class="media"
-            loading="lazy"
-            on:error={() => (errored = [...errored, post.id])}
-          />
-        {/if}
-      </a>
+      <Post on:error={() => (errored = [...errored, post.id])} {post} />
     {/if}
   </Masonry>
 </div>
@@ -164,13 +132,3 @@
 {:else if outOfPosts || postCount == 0}
   <div class="flex w-full justify-center my-5 text-lg">No more posts</div>
 {/if}
-
-<style>
-  .media {
-    @apply w-full mb-4 absolute inset-0 z-10;
-  }
-
-  a {
-    @apply w-full relative block;
-  }
-</style>
