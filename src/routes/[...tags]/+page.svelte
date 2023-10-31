@@ -10,18 +10,24 @@
   import { browser } from "$app/environment";
   import { page } from "$app/stores";
   import Header from "$lib/Header.svelte";
+  import Sorting from "./Sorting.svelte";
+
+  const reset = () => {
+    postsInView = [];
+    posts = [];
+    pageIndex = 0;
+    outOfPosts = false;
+  };
 
   const {
     elements: { root, input, tag, deleteTrigger, edit },
     states: { tags },
+    helpers: { updateTag, addTag, removeTag },
   } = createTagsInput({
     unique: true,
     defaultTags: $page.params.tags?.length ? $page.params.tags!.split(" ") : [],
-    onTagsChange: ({ curr, next }) => {
-      postsInView = [];
-      posts = [];
-      pageIndex = 1;
-      outOfPosts = false;
+    onTagsChange: ({ next }) => {
+      reset();
 
       const targetTags = next.map((t) => ({
         ...t,
@@ -50,9 +56,12 @@
     if (loading || outOfPosts) return;
     loading = true;
 
+    let query = (tagOverwrite ?? $tags).map((t) => t.value);
+    if (!query.some((t) => t.startsWith("sort:"))) query.push("sort:score");
+
     const params = {
-      query: (tagOverwrite ?? $tags).map((t) => t.value).join(" "),
-      page: (pageIndex++).toString(),
+      query: query.join(" "),
+      page: pageIndex.toString(),
     };
 
     fetch(
@@ -60,6 +69,7 @@
     )
       .then((res) => res.json())
       .then((res) => {
+        pageIndex++;
         if (res.length == 0) outOfPosts = true;
         else
           posts = [
@@ -75,10 +85,7 @@
             })),
           ];
       })
-      .catch((e) => {
-        pageIndex--;
-        throw e;
-      })
+
       .finally(() => (loading = false));
   };
 
@@ -89,7 +96,7 @@
       `/${
         $tags.length ? $tags.map((t) => t.value).join(" ") : ""
       }?${new URLSearchParams({
-        page: (pageIndex - 1).toString(),
+        page: pageIndex.toString(),
       })}`,
       {
         replaceState: true,
@@ -97,6 +104,8 @@
         invalidateAll: false,
       }
     );
+
+  let sort: any;
 </script>
 
 <svelte:window
@@ -119,9 +128,9 @@
   <Header />
   <div
     use:melt={$root}
-    class="w-full z-50 focus:outline-none dark:bg-neutral-900 bg-neutral-200 px-4 py-2 rounded-lg flex gap-2 overflow-x-auto"
+    class="w-full z-50 focus:outline-none dark:bg-neutral-900 bg-neutral-200 px-4 py-2 rounded-lg flex gap-2 overflow-x-auto mb-2"
   >
-    {#each $tags as t}
+    {#each $tags.filter((t) => !t.value.startsWith("sort:")) as t (t.value)}
       <div
         use:melt={$tag(t)}
         class="flex items-center bg-neutral-800 rounded-md pl-1.5"
@@ -150,6 +159,26 @@
       class="data-[invalid]:text-red-500 bg-transparent"
     />
   </div>
+
+  <Sorting
+    bind:value={sort}
+    onSelectedChange={({ next }) => {
+      const existingSortTag = $tags.find((t) => t.value.startsWith("sort:"));
+      if (next.value == "") existingSortTag && removeTag(existingSortTag);
+      else {
+        const value = `sort:${next.value}`;
+        if (existingSortTag)
+          updateTag({
+            ...existingSortTag,
+            value,
+          });
+        else addTag(value);
+      }
+      reset();
+      fetchNextPage();
+      return next;
+    }}
+  />
 </div>
 
 <Masonry items={posts} let:item={post} let:index={i}>
