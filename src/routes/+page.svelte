@@ -51,18 +51,36 @@
     if (loading || outOfPosts) return;
     loading = true;
 
-    const params: Record<string, string> = {
+    const params = {
       query: (tagOverwrite ?? $tags).map((t) => t.value).join(" "),
       page: (pageIndex++).toString(),
     };
 
-    fetch(`/posts?${new URLSearchParams(params)}`)
+    fetch(
+      `https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&limit=100&pid=${params.page}&tags=${params.query}`
+    )
       .then((res) => res.json())
       .then((res) => {
-        loading = false;
         if (res.length == 0) outOfPosts = true;
-        else posts = [...posts, ...res];
-      });
+        else
+          posts = [
+            ...posts,
+            ...res.map((post: any) => ({
+              id: post.id,
+              sample_url: post.sample_url,
+              file_url: post.file_url,
+              width: post.width,
+              height: post.height,
+              tags: post.tags.split(" "),
+              source: post.source,
+            })),
+          ];
+      })
+      .catch((e) => {
+        pageIndex--;
+        throw e;
+      })
+      .finally(() => (loading = false));
   };
 
   onMount(fetchNextPage);
@@ -122,7 +140,9 @@
         class="flex items-center overflow-hidden rounded-md px-1.5 [word-break:break-word] data-[invalid-edit]:focus:!ring-red-500"
       />
     {/each}
+    <!-- svelte-ignore a11y-autofocus -->
     <input
+      autofocus
       use:melt={$input}
       type="text"
       placeholder="Enter tags..."
