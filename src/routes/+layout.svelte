@@ -9,6 +9,21 @@
   });
 </script>
 
+<svelte:head>
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-CDWGY2LDKQ"
+  ></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+    gtag("config", "G-CDWGY2LDKQ");
+  </script>
+</svelte:head>
+
 {#if !unlocked}
   <div
     class="fixed inset-0 backdrop-blur-lg flex items-center justify-center text-center z-[9999]"
