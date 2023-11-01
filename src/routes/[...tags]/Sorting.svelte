@@ -43,8 +43,15 @@
       fitViewport: true,
       sameWidth: true,
     },
-    defaultSelected: $page.url.searchParams.has("sort")
-      ? options.find((o) => o.value === $page.url.searchParams.get("sort"))
+    defaultSelected: $page.params.tags.includes("sort:")
+      ? options.find(
+          (o) =>
+            o.value ===
+            $page.params.tags
+              .split(" ")
+              .find((t) => t.startsWith("sort:"))!
+              .substring(5)
+        )!
       : options[0],
     onSelectedChange,
   });
@@ -52,15 +59,15 @@
   export const value = selected;
 </script>
 
-<div class="flex flex-col gap-1">
+<div class="flex flex-col gap-1 min-w-[12rem]">
   <button
-    class="flex h-10 items-center justify-between rounded-lg px-3 py-1 w-full text-sm bg-neutral-900"
+    class="flex gap-2 h-10 items-center justify-between rounded-lg px-3 py-1 w-full text-sm bg-neutral-900"
     use:melt={$trigger}
   >
-    <span
-      ><span class="text-neutral-300">Sort by</span>
-      {$selectedLabel.toLocaleLowerCase() || "none"}</span
-    >
+    <span class="whitespace-nowrap">
+      <span class="text-neutral-300">Sort by</span>
+      {$selectedLabel.toLocaleLowerCase() || "none"}
+    </span>
     <Icon src={ChevronDown} class="w-4 h-4" />
   </button>
   {#if $open}

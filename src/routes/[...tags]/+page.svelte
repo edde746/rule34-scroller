@@ -17,6 +17,7 @@
     posts = [];
     pageIndex = 0;
     outOfPosts = false;
+    resetMasonry();
   };
 
   const {
@@ -42,6 +43,7 @@
   let posts: Post[] = [];
   let postsInView: string[] = [];
   let errored: number[] = [];
+  let resetMasonry: () => void;
 
   let pageIndex = parseInt($page.url.searchParams.get("page") || "0");
 
@@ -93,9 +95,9 @@
 
   $: browser &&
     goto(
-      `/${
+      `/${encodeURIComponent(
         $tags.length ? $tags.map((t) => t.value).join(" ") : ""
-      }?${new URLSearchParams({
+      )}?${new URLSearchParams({
         page: pageIndex.toString(),
       })}`,
       {
@@ -105,19 +107,25 @@
       }
     );
 
-  let sort: any;
+  let sort: any,
+    heights: number[] = [];
 </script>
 
 <svelte:window
   on:scroll={() => {
-    if (window.innerHeight * 1.6 + window.scrollY >= document.body.offsetHeight)
-      fetchNextPage();
+    const triggerPoint = window.innerHeight * 1.6 + window.scrollY;
+    if (heights.some((top) => triggerPoint > top)) fetchNextPage();
   }}
 />
 
 <svelte:head>
   {#if $tags.filter((t) => !t.value.startsWith("sort:")).length}
-    <title>{$page.params.tags} - hntai.lol</title>
+    <title>
+      {$tags
+        .map((t) => t.value)
+        .filter((t) => !t.startsWith("sort:"))
+        .join(" ")} - hntai.lol
+    </title>
     <meta
       name="description"
       content="Discover thousands of high quality {$tags
@@ -126,7 +134,7 @@
         .replace(/_/g, ' ')} and more images and videos on hntai.lol"
     />
   {:else}
-    <title>Welcome to hntai.lol</title>
+    <title>View the best hentai images and videos on hntai.lol</title>
     <meta
       name="description"
       content="Discover thousands of high quality hentai porn images and videos on hntai.lol"
@@ -136,62 +144,65 @@
 
 <div class="py-4 solid-bg sticky top-0 z-50">
   <Header />
-  <div
-    use:melt={$root}
-    class="w-full z-50 focus:outline-none dark:bg-neutral-900 bg-neutral-200 px-4 py-2 rounded-lg flex gap-2 overflow-x-auto mb-2"
-  >
-    {#each $tags.filter((t) => !t.value.startsWith("sort:")) as t (t.value)}
-      <div
-        use:melt={$tag(t)}
-        class="flex items-center bg-neutral-800 rounded-md pl-1.5"
-      >
-        <span>
-          {t.value}
-        </span>
-        <button
-          use:melt={$deleteTrigger(t)}
-          class="flex h-full items-center rounded-md px-1.5 hover:opacity-90"
+  <div class="flex flex-col md:flex-row gap-2 md:gap-4">
+    <div
+      use:melt={$root}
+      class="w-full z-50 focus:outline-none dark:bg-neutral-900 bg-neutral-200 px-4 py-2 rounded-lg flex gap-2 overflow-x-auto"
+    >
+      {#each $tags.filter((t) => !t.value.startsWith("sort:")) as t (t.value)}
+        <div
+          use:melt={$tag(t)}
+          class="flex items-center bg-neutral-800 rounded-md pl-1.5"
         >
-          <Icon src={X} class="w-3 h-3" />
-        </button>
-      </div>
-      <div
-        use:melt={$edit(t)}
-        class="flex items-center overflow-hidden rounded-md px-1.5 [word-break:break-word] data-[invalid-edit]:focus:!ring-red-500"
+          <span>
+            {t.value}
+          </span>
+          <button
+            use:melt={$deleteTrigger(t)}
+            class="flex h-full items-center rounded-md px-1.5 hover:opacity-90"
+          >
+            <Icon src={X} class="w-3 h-3" />
+          </button>
+        </div>
+        <div
+          use:melt={$edit(t)}
+          class="flex items-center overflow-hidden rounded-md px-1.5 [word-break:break-word] data-[invalid-edit]:focus:!ring-red-500"
+        />
+      {/each}
+      <!-- svelte-ignore a11y-autofocus -->
+
+      <input
+        autofocus
+        use:melt={$input}
+        type="text"
+        placeholder="Enter tags..."
+        class="data-[invalid]:text-red-500 bg-transparent"
       />
-    {/each}
-    <!-- svelte-ignore a11y-autofocus -->
-    <input
-      autofocus
-      use:melt={$input}
-      type="text"
-      placeholder="Enter tags..."
-      class="data-[invalid]:text-red-500 bg-transparent"
+    </div>
+
+    <Sorting
+      bind:value={sort}
+      onSelectedChange={({ next }) => {
+        const existingSortTag = $tags.find((t) => t.value.startsWith("sort:"));
+        if (next.value == "") existingSortTag && removeTag(existingSortTag);
+        else {
+          const value = `sort:${next.value}`;
+          if (existingSortTag)
+            updateTag({
+              ...existingSortTag,
+              value,
+            });
+          else addTag(value);
+        }
+        reset();
+        fetchNextPage();
+        return next;
+      }}
     />
   </div>
-
-  <Sorting
-    bind:value={sort}
-    onSelectedChange={({ next }) => {
-      const existingSortTag = $tags.find((t) => t.value.startsWith("sort:"));
-      if (next.value == "") existingSortTag && removeTag(existingSortTag);
-      else {
-        const value = `sort:${next.value}`;
-        if (existingSortTag)
-          updateTag({
-            ...existingSortTag,
-            value,
-          });
-        else addTag(value);
-      }
-      reset();
-      fetchNextPage();
-      return next;
-    }}
-  />
 </div>
 
-<Masonry items={posts} let:item={post} let:index={i}>
+<Masonry items={posts} let:item={post} bind:heights bind:reset={resetMasonry}>
   {#if post}
     <Post on:error={() => (errored = [...errored, post.id])} {post} />
   {/if}

@@ -39,7 +39,7 @@
 
       <div class="flex gap-2 mt-4">
         <a
-          href="https://www.google.com/search?q=how+to+block+websites"
+          href="https://www.google.com/"
           target="_blank"
           rel="noopener noreferrer"
           class="pill bg-blue-500"

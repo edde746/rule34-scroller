@@ -5,20 +5,30 @@
   export let items: any[] = [];
   let grid: HTMLDivElement;
   let columns: { height: number; items: any[] }[] = [];
+  export let heights: number[] = [];
   let orderedUntil = 0;
+  export let columnCount = 0;
+
+  export const reset = () => {
+    columns = [];
+    orderedUntil = 0;
+  };
 
   let rows: number[][] = [];
   const refreshGrid = async () => {
     await tick();
     // get the number of columns
-    const nCol = getComputedStyle(grid).gridTemplateColumns.split(" ").length;
+    columnCount = getComputedStyle(grid).gridTemplateColumns.split(" ").length;
     const gap = parseFloat(getComputedStyle(grid).gap) || 8;
     const itemWidth = parseFloat(
       getComputedStyle(grid).gridTemplateColumns.split(" ")[0]
     );
 
-    if (columns.length !== nCol) {
-      columns = Array.from({ length: nCol }, () => ({ height: 0, items: [] }));
+    if (columns.length !== columnCount) {
+      columns = Array.from({ length: columnCount }, () => ({
+        height: 0,
+        items: [],
+      }));
       orderedUntil = 0;
     }
 
@@ -46,14 +56,18 @@
     // loop over grid children and assign margin-top
     const gridItems = Array.from(grid.children) as HTMLElement[];
     gridItems.forEach((item, i) => {
-      if (i < nCol) return;
+      if (i < columnCount) return;
       item.style.removeProperty("margin-top");
 
       const diff =
-        gridItems[i - nCol]?.getBoundingClientRect().bottom -
+        gridItems[i - columnCount]?.getBoundingClientRect().bottom -
         item.getBoundingClientRect().top;
       if (diff < 0) item.style.marginTop = `${diff + gap}px`;
     });
+
+    heights = [...grid.children]
+      .slice(-columnCount)
+      .map((e) => e.getBoundingClientRect().top + window.scrollY);
   };
 
   $: items.length > 0 && browser && refreshGrid();
