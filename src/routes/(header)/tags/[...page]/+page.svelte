@@ -4,6 +4,7 @@
   import type { PageData } from "./$types";
   import { ChevronLeft, ChevronRight } from "@steeze-ui/lucide-icons";
   import { goto } from "$app/navigation";
+  import name from "$lib/name";
 
   export let data: PageData;
 
@@ -13,9 +14,11 @@
 
 <svelte:head>
   {#if currentPage == 1}
-    <title>Tag Directory - {$page.url.hostname}</title>
+    <title>Tag Directory - {name($page.url.hostname)}</title>
   {:else}
-    <title>Page {currentPage} - Tag Directory - {$page.url.hostname}</title>
+    <title
+      >Page {currentPage} - Tag Directory - {name($page.url.hostname)}</title
+    >
   {/if}
   <meta
     name="description"
@@ -24,7 +27,7 @@
       .slice(0, 3)
       .map((t) => t.name)
       .join(', ')
-      .replace(/_/g, ' ')} and more on {$page.url.hostname}"
+      .replace(/_/g, ' ')} and more on {name($page.url.hostname)}"
   />
 </svelte:head>
 

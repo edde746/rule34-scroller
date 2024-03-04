@@ -11,6 +11,7 @@
   import { page } from "$app/stores";
   import Header from "$lib/Header.svelte";
   import Sorting from "./Sorting.svelte";
+  import name from "$lib/name";
 
   const reset = () => {
     postsInView = [];
@@ -124,22 +125,28 @@
       {$tags
         .map((t) => t.value)
         .filter((t) => !t.startsWith("sort:"))
-        .join(" ")} - {$page.url.hostname}
+        .join(" ")} - {name($page.url.hostname)}
     </title>
     <meta
       name="description"
       content="Discover thousands of high quality {$tags
         .filter((t) => !t.value.startsWith('sort:'))
         .join(', ')
-        .replace(/_/g, ' ')} and more images and videos on {$page.url.hostname}"
+        .replace(/_/g, ' ')} and more images and videos on {name(
+        $page.url.hostname
+      )}"
     />
   {:else}
-    <title>View the best hentai images and videos on {$page.url.hostname}</title
+    <title
+      >View the best hentai images and videos on {name(
+        $page.url.hostname
+      )}</title
     >
     <meta
       name="description"
-      content="Discover thousands of high quality hentai porn images and videos on {$page
-        .url.hostname}"
+      content="Discover thousands of high quality hentai porn images and videos on {name(
+        $page.url.hostname
+      )}"
     />
   {/if}
 </svelte:head>

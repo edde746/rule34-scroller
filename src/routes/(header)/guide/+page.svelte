@@ -1,13 +1,15 @@
 <script>
+  import name from "$lib/name";
   import { page } from "$app/stores";
 </script>
 
 <svelte:head>
-  <title>Guide - {$page.url.hostname}</title>
+  <title>Guide - {name($page.url.hostname)}</title>
   <meta
     name="description"
-    content="Learn how to best search {$page.url
-      .hostname} for the content you want to see the most"
+    content="Learn how to best search {name(
+      $page.url.hostname
+    )} for the content you want to see the most"
   />
 </svelte:head>
 
