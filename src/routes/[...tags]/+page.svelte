@@ -152,7 +152,7 @@
       {#each $tags.filter((t) => !t.value.startsWith("sort:")) as t (t.value)}
         <div
           use:melt={$tag(t)}
-          class="flex items-center bg-neutral-800 rounded-md pl-1.5"
+          class="flex items-center bg-neutral-800 rounded-md pl-1.5 whitespace-nowrap"
         >
           <span>
             {t.value}
