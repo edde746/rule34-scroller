@@ -124,20 +124,22 @@
       {$tags
         .map((t) => t.value)
         .filter((t) => !t.startsWith("sort:"))
-        .join(" ")} - hntai.lol
+        .join(" ")} - {$page.url.hostname}
     </title>
     <meta
       name="description"
       content="Discover thousands of high quality {$tags
         .filter((t) => !t.value.startsWith('sort:'))
         .join(', ')
-        .replace(/_/g, ' ')} and more images and videos on hntai.lol"
+        .replace(/_/g, ' ')} and more images and videos on {$page.url.hostname}"
     />
   {:else}
-    <title>View the best hentai images and videos on hntai.lol</title>
+    <title>View the best hentai images and videos on {$page.url.hostname}</title
+    >
     <meta
       name="description"
-      content="Discover thousands of high quality hentai porn images and videos on hntai.lol"
+      content="Discover thousands of high quality hentai porn images and videos on {$page
+        .url.hostname}"
     />
   {/if}
 </svelte:head>

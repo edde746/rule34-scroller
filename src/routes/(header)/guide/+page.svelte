@@ -1,8 +1,13 @@
+<script>
+  import { page } from "$app/stores";
+</script>
+
 <svelte:head>
-  <title>Guide - hntai.lol</title>
+  <title>Guide - {$page.url.hostname}</title>
   <meta
     name="description"
-    content="Learn how to best search hntai.lol for the content you want to see the most"
+    content="Learn how to best search {$page.url
+      .hostname} for the content you want to see the most"
   />
 </svelte:head>
 

@@ -13,9 +13,9 @@
 
 <svelte:head>
   {#if currentPage == 1}
-    <title>Tag Directory - hntai.lol</title>
+    <title>Tag Directory - {$page.url.hostname}</title>
   {:else}
-    <title>Page {currentPage} - Tag Directory - hntai.lol</title>
+    <title>Page {currentPage} - Tag Directory - {$page.url.hostname}</title>
   {/if}
   <meta
     name="description"
@@ -24,7 +24,7 @@
       .slice(0, 3)
       .map((t) => t.name)
       .join(', ')
-      .replace(/_/g, ' ')} and more on hntai.lol"
+      .replace(/_/g, ' ')} and more on {$page.url.hostname}"
   />
 </svelte:head>
 

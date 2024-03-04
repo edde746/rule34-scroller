@@ -2,6 +2,7 @@
   import { Icon } from "@steeze-ui/svelte-icon";
   import type { PageData } from "./$types";
   import { ArrowUp, ExternalLink } from "@steeze-ui/lucide-icons";
+  import { page } from "$app/stores";
 
   export let data: PageData;
   let imageHeight: number;
@@ -10,7 +11,7 @@
 </script>
 
 <svelte:head>
-  <title>Post #{data.id} - hntai.lol</title>
+  <title>Post #{data.id} - {$page.url.hostname}</title>
   <meta
     name="description"
     content="View post #{data.id} with tags like {data.tags
@@ -18,7 +19,8 @@
       .sort((a, b) => Math.random() - 0.5)
       .slice(0, 5)
       .join(', ')
-      .replace(/_/g, ' ')} and more hentai images and videos on hntai.lol"
+      .replace(/_/g, ' ')} and more hentai images and videos on {$page.url
+      .hostname}"
   />
 </svelte:head>
 
