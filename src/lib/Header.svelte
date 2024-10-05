@@ -1,7 +1,7 @@
 <script>
   import name from "./name";
   import { page } from "$app/stores";
-  import { HelpCircle, Home, Tag } from "@steeze-ui/lucide-icons";
+  import { CircleHelp, House, Tag } from "@steeze-ui/lucide-icons";
   import { Icon } from "@steeze-ui/svelte-icon";
 </script>
 
@@ -9,7 +9,7 @@
   <h1 class="font-semibold">{name($page.url.hostname)}</h1>
   <nav>
     <a href="/">
-      <Icon src={Home} class="w-4 h-4" />
+      <Icon src={House} class="w-4 h-4" />
       <span>Home</span>
     </a>
     <a href="/tags">
@@ -17,7 +17,7 @@
       <span>Tags</span>
     </a>
     <a href="/guide">
-      <Icon src={HelpCircle} class="w-4 h-4" />
+      <Icon src={CircleHelp} class="w-4 h-4" />
       <span>Guide</span>
     </a>
   </nav>
