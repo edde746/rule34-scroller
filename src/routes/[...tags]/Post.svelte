@@ -10,7 +10,7 @@
     class="absolute inset-x-0 bottom-0 flex w-full z-20 group-focus-within:opacity-100 group-hover:opacity-100 opacity-0 transition-opacity duration-200 ease-in-out"
   >
     <a
-      href={post.file_url}
+      href={post.file_url.replace("api-cdn-mp4", "wimg")}
       target="_blank"
       rel="noopener noreferrer"
       class="bg-purple-500 flex items-center justify-center w-full"
