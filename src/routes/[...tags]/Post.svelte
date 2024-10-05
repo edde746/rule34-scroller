@@ -5,10 +5,7 @@
   export let post: Post;
 </script>
 
-<article
-  class="w-full relative block group overflow-hidden"
-  style="aspect-ratio: {post.width}/{post.height}"
->
+<article class="group" style="aspect-ratio: {post.width}/{post.height}">
   <div
     class="absolute inset-x-0 bottom-0 flex w-full z-20 group-focus-within:opacity-100 group-hover:opacity-100 opacity-0 transition-opacity duration-200 ease-in-out"
   >
@@ -28,11 +25,7 @@
     >
       <Icon src={Search} class="w-4 h-4 text-neutral-100" />
     </a>
-    <a
-      href="/post/{post.id}"
-      target="_blank"
-      class="bg-sky-500 flex items-center justify-center w-full p-2"
-    >
+    <a href="/post/{post.id}" target="_blank" class="bg-sky-500 flex items-center justify-center w-full p-2">
       <Icon src={Info} class="w-4 h-4 text-neutral-100" />
     </a>
   </div>
@@ -42,23 +35,18 @@
     <div class="inset-0 absolute p-2 top-0 left-0 z-10">
       <Icon src={Play} class="w-6 h-6 text-neutral-100 play-button" />
     </div>
-    <img
-      src={post.sample_url}
-      alt={post.tags.join(", ")}
-      loading="lazy"
-      on:error
-    />
+    <img src={post.sample_url} alt={post.tags.join(", ")} loading="lazy" on:error />
   {:else}
-    <img
-      src={post.sample_url}
-      alt={post.tags.join(", ")}
-      loading="lazy"
-      on:error
-    />
+    <img src={post.sample_url} alt={post.tags.join(", ")} loading="lazy" on:error />
   {/if}
 </article>
 
 <style>
+  article {
+    @apply w-full relative block overflow-hidden;
+    content-visibility: auto;
+  }
+
   img {
     @apply w-full mb-4 absolute inset-0 z-10;
   }
